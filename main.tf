@@ -24,3 +24,34 @@ resource "azurerm_network_interface" "nic" {
     private_ip_address_allocation = "Dynamic"
   }
 }
+resource "azurerm_public_ip" "publicip" {
+  name                = "myPublicIP"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  allocation_method   = "Static"          # Must be Static for Standard SKU
+  sku                 = "Standard"   
+}
+resource "azurerm_storage_account" "storage" {
+  name                     = "stterraformdemo123"
+  resource_group_name      = azurerm_resource_group.example.name
+  location                 = azurerm_resource_group.example.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+}
+resource "azurerm_network_security_group" "nsg" {
+  name                = "nsg-demo"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+}
+resource "azurerm_network_interface_security_group_association" "nic_nsg" {
+  network_interface_id      = azurerm_network_interface.nic.id
+  network_security_group_id = azurerm_network_security_group.nsg.id
+}
+variable "tenant_id" {
+  description = "The Tenant ID for the Azure Service Principal"
+  type        = string
+}
+variable "client_id" {
+  description = "The Client ID for the Azure Service Principal"
+  type        = string
+}
